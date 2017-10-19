@@ -9,10 +9,11 @@
     <div class="ms-doc">
       <h3 class="home-index">宙斯盾爬虫平台(Aegis Spider Platform)</h3>
       <article>
-        <h2 class="spider-des">Aegis 简述
-          <br/>
-          <label class="ms-description">该平台主要适用个人用户对网页数据的爬虫需求，并不针对企业用户</label>
-        </h2>
+        <h2 class="spider-des">Aegis 简述</h2>
+        <el-alert
+          title="该平台主要适用个人用户对网页数据的爬虫需求，并不针对企业用户"
+          type="warning" :closable="false">
+        </el-alert>
 
         <div style="margin-top: 5%">
           <el-carousel :interval="4000" type="card" height="200px">
