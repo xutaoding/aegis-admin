@@ -24,6 +24,8 @@
     </div>
 </template>
 <script>
+  import {decrypt} from '../../utils/crypto'
+
     export default {
         data() {
             return {
@@ -33,7 +35,12 @@
         computed:{
             username(){
                 let _username = localStorage.getItem('ms_username');
-                return _username ? _username : this.name;
+
+                if (_username) {
+                  return decrypt(_username)
+                }
+
+                return this.name;
             }
         },
         methods:{

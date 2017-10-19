@@ -80,7 +80,7 @@
 
             self.$axios.post(self.$dispatch.login, {en_token: encrypted}).then((resp) => {
                   if (resp.data.token) {
-                    localStorage.setItem('ms_username', self.ruleForm.username);
+                    localStorage.setItem('ms_username', encrypt(self.ruleForm.username));
                     Cookies.set('drf-apo', resp.data.token);
                     self.$router.push('/index');
                   }
