@@ -6,5 +6,6 @@ export default {
   'sendMail': SERVER + '/account/mail/send',
   'registerUser': SERVER + '/account/register',
   'forgetPassword': SERVER + '/account/forget-password',
+  'aegisDownloader': SERVER + '/aegis/downloader',
 }
 

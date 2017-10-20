@@ -21,9 +21,12 @@
               <el-input placeholder="请输入抓取网页的URL" v-model="ruleForm.url"></el-input>
             </el-form-item>
 
-            <!--<el-form-item label="下载延迟" prop="download_delay">-->
-              <!--<el-input v-model="ruleForm.download_delay"></el-input>-->
-            <!--</el-form-item>-->
+            <el-form-item label="请求方式" prop="method">
+              <el-select v-model="ruleForm.method" style="width: 100%">
+                <el-option v-for="meth in options" :key="meth" :label="meth" :value="meth">
+                </el-option>
+              </el-select>
+            </el-form-item>
 
             <!--<el-form-item label="并发数" prop="concurrency">-->
               <!--<el-input v-model="ruleForm.concurrency"></el-input>-->
@@ -60,21 +63,47 @@
 </template>
 
 <script>
+  import encrypt from '../../utils/crypto'
+
   export default {
     data: function () {
+      var checkName = (rule, value, callback) => {
+        if (!value.trim()) {
+          return callback(new Error('用户名不能为空'));
+        }
+
+        callback();
+      };
+
+      let ss = localStorage.getItem('ms-username');
+
       return {
         activeName: 'free',
         fee_payed: false,
+        options: ['GET', 'POST'],
 
         ruleForm: {
           url: null,
           name: '',
+          method: 'GET',
           description: '',
         },
 
         rules: {
-          name: {required: true, message: '请输入爬虫名称', trigger: 'blur'},
-          url: {required: true, message: '请输入目标网址', trigger: 'blur'},
+          name: [
+            {required: true, message: '请输入爬虫名称', trigger: 'blur'},
+            {validator: checkName, trigger: 'blur'}
+          ],
+
+          method: [
+            {required: true, message: '请选择请求方式', trigger: 'blur'},
+          ],
+
+          url: [
+            {required: true, message: '请输入目标网址', trigger: 'blur'},
+            {type: 'url', trigger: 'blur'},
+          ],
+
           description: [
             {required: true, message: '请对该爬虫作简要描述', trigger: 'blur'},
             {max: 30, message: '最多30字的简述文字', trigger: 'blur'},
@@ -90,6 +119,18 @@
         self.$refs[formName].validate((valid) => {
           if (valid) {
 //            localStorage.setItem('spider_url', self.ruleForm.url);
+            let data = {'en_token': encrypt(JSON.stringify(self.ruleForm))};
+            console.log(self.ruleForm);
+
+//            self.$axios.post(self.$dispatch.aegisDownloader, data).then((resp) => {
+//
+//            }).catch((err) => {
+//              self.$notify({
+//                message: err.toString(),
+//                type: 'error'
+//              });
+//            });
+
 
 
             self.$router.push('/spider-rules');
@@ -98,6 +139,12 @@
             return false;
           }
         });
+
+      }
+    },
+
+    computed: {
+      isPaymentUser(){
 
       }
     }
