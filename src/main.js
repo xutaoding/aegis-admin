@@ -3,7 +3,6 @@
 import Vue from 'vue'
 import App from './App'
 import router from './router'
-import axios from "axios"
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-default/index.css'
 
@@ -14,9 +13,11 @@ import { Notification } from 'element-ui';
 
 import '../static/css/iconfont-aegis.css'
 import dispatch from "./utils/dispatch";
+import axios from './utils/axios-helper'
 
 Vue.use(ElementUI);
 Vue.use(VueBlu);
+
 Vue.prototype.$axios = axios;
 Vue.prototype.$dispatch = dispatch;
 Vue.prototype.$notify = Notification;
