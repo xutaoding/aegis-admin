@@ -9,14 +9,21 @@ import router from '../router'
 */
 axios.interceptors.request.use(
   config => {
-    const token = Cookies.get('token');  //获取Cookie
+    const token = Cookies.get('JWT-MSC');  //获取Cookie
     config.data = JSON.stringify(config.data);
+    console.log('auth token:');
+    console.log(token);
 
     if (token) {
       config.headers = {
         // 'Content-Type':'application/x-www-form-urlencoded' //设置跨域头部
+        'Content-Type': 'application/json',
         'Authorization': 'JWT-MSC ' + token
       };
+    } else {
+      config.headers = {
+        'Content-Type': 'application/json'
+      }
     }
     return config;
   },
@@ -35,9 +42,12 @@ axios.interceptors.response.use(
     return response;
   },
   error => {
+    console.log(error.response);
     if (error.response.status === 401 && error.response.statusText === "Unauthorized") {
       alert('登录已过期， 请重新登录');
-      router.push('/index');
+
+      localStorage.removeItem('ms_username');
+      window.location.href = '/';
       return false;
     }
 

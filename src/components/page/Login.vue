@@ -81,15 +81,14 @@
             self.$axios.post(self.$dispatch.login, {en_token: encrypted}).then((resp) => {
                   if (resp.data.token) {
                     localStorage.setItem('ms_username', encrypt(self.ruleForm.username));
-                    Cookies.set('drf-apo', resp.data.token);
+                    Cookies.set('JWT-MSC', resp.data.token);
                     self.$router.push('/index');
                   }
 
             }).catch((err) => {
-                self.$notify({
-                  message: err.toString(),
-                  type: 'error',
-                });
+                let message = err.non_field_errors.join();
+
+                self.$notify({message: message, type: 'error'});
             });
 
           } else {

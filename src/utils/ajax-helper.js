@@ -15,7 +15,12 @@ function AjaxHelper() {
 
 			success: callback,
 			error: function(xhr, errorType, error) {
-				console.log('Ajax request error, errorType: ' + errorType +  ', error: ' + error)
+        if (xhr.status === 401 && xhr.statusText === "Unauthorized") {
+          alert('登录已过期， 请重新登录');
+
+          localStorage.removeItem('ms_username');
+          window.location.href = '/';
+        }
 			}
 		})
 	}

@@ -21,7 +21,7 @@
               <el-input placeholder="请输入抓取网页的URL" v-model="ruleForm.url"></el-input>
             </el-form-item>
 
-            <el-form-item label="请求方式" prop="method">
+            <el-form-item v-if="fee_payed" label="请求方式" prop="method">
               <el-select v-model="ruleForm.method" style="width: 100%">
                 <el-option v-for="meth in options" :key="meth" :label="meth" :value="meth">
                 </el-option>
@@ -63,7 +63,9 @@
 </template>
 
 <script>
-  import encrypt from '../../utils/crypto'
+  import $ from 'jquery'
+  import Cookies from 'js-cookie'
+  import encrypt, {decrypt} from '../../utils/crypto'
 
   export default {
     data: function () {
@@ -75,11 +77,8 @@
         callback();
       };
 
-      let ss = localStorage.getItem('ms-username');
-
       return {
         activeName: 'free',
-        fee_payed: false,
         options: ['GET', 'POST'],
 
         ruleForm: {
@@ -144,8 +143,34 @@
     },
 
     computed: {
-      isPaymentUser(){
+      fee_payed(){
+        let self = this;
+        let is_payment = false;
 
+        let encrypt_user = localStorage.getItem('ms_username');
+        let decrypt_user = decrypt(encrypt_user);
+        let isPaymentApi = self.$dispatch.aegisIsPayment.replace('{username}', decrypt_user);
+
+        $.ajax({
+            url: isPaymentApi,
+            async:false,
+            beforeSend: function(request) {
+              request.setRequestHeader("Authorization", 'JWT-MSC ' + Cookies.get('JWT-MSC'));
+            },
+            success: function (resp) {
+              is_payment = true;
+            },
+            error: function (xhr, status, err) {
+              if (xhr.status === 401 && xhr.statusText === "Unauthorized") {
+                alert('登录已过期， 请重新登录');
+
+                localStorage.removeItem('ms_username');
+                window.location.href = '/';
+              }
+            }
+        });
+
+        return is_payment;
       }
     }
 
