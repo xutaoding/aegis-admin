@@ -6,7 +6,9 @@ export default {
   'sendMail': SERVER + '/account/mail/send',
   'registerUser': SERVER + '/account/register',
   'forgetPassword': SERVER + '/account/forget-password',
+
   'aegisDownloader': SERVER + '/aegis/downloader',
   'aegisIsPayment': SERVER + '/aegis/{username}/payment',
+  'createSpider': SERVER + '/aegis/spider-task/create'
 }
 

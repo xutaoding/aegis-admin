@@ -13,16 +13,16 @@
       <div class="ms-detail">
         <div class="ms-form">
           <el-form :model="ruleForm" ref="ruleForm" :rules="rules" label-width="90px" class="demo-ruleForm">
-            <el-form-item label="爬虫名称" prop="name">
-              <el-input placeholder="请输入爬虫名称" v-model="ruleForm.name"></el-input>
+            <el-form-item label="爬虫名称" prop="spider_name">
+              <el-input placeholder="请输入爬虫名称" v-model="ruleForm.spider_name"></el-input>
             </el-form-item>
 
             <el-form-item label="目标网址" prop="url">
               <el-input placeholder="请输入抓取网页的URL" v-model="ruleForm.url"></el-input>
             </el-form-item>
 
-            <el-form-item v-if="fee_payed" label="请求方式" prop="method">
-              <el-select v-model="ruleForm.method" style="width: 100%">
+            <el-form-item v-if="fee_payed" label="请求方式" prop="request_method">
+              <el-select v-model="ruleForm.request_method" style="width: 100%">
                 <el-option v-for="meth in options" :key="meth" :label="meth" :value="meth">
                 </el-option>
               </el-select>
@@ -42,8 +42,8 @@
               <!--</el-input>-->
             <!--</el-form-item>-->
 
-            <el-form-item label="爬虫描述" prop="description">
-              <el-input v-model="ruleForm.description" type="textarea" :autosize="{ minRows: 2, maxRows: 4}"
+            <el-form-item label="爬虫描述" prop="spider_description">
+              <el-input v-model="ruleForm.spider_description" type="textarea" :autosize="{ minRows: 2, maxRows: 4}"
                         resize="none" placeholder="该爬虫任务的简要描述（最多30字）">
               </el-input>
             </el-form-item>
@@ -71,7 +71,7 @@
     data: function () {
       var checkName = (rule, value, callback) => {
         if (!value.trim()) {
-          return callback(new Error('用户名不能为空'));
+          return callback(new Error('爬虫名称不能为空'));
         }
 
         callback();
@@ -83,18 +83,18 @@
 
         ruleForm: {
           url: null,
-          name: '',
-          method: 'GET',
-          description: '',
+          spider_name: '',
+          request_method: 'GET',
+          spider_description: '',
         },
 
         rules: {
-          name: [
+          spider_name: [
             {required: true, message: '请输入爬虫名称', trigger: 'blur'},
             {validator: checkName, trigger: 'blur'}
           ],
 
-          method: [
+          request_method: [
             {required: true, message: '请选择请求方式', trigger: 'blur'},
           ],
 
@@ -103,7 +103,7 @@
             {type: 'url', trigger: 'blur'},
           ],
 
-          description: [
+          spider_description: [
             {required: true, message: '请对该爬虫作简要描述', trigger: 'blur'},
             {max: 30, message: '最多30字的简述文字', trigger: 'blur'},
           ]
@@ -117,20 +117,18 @@
 
         self.$refs[formName].validate((valid) => {
           if (valid) {
-//            localStorage.setItem('spider_url', self.ruleForm.url);
             let data = {'en_token': encrypt(JSON.stringify(self.ruleForm))};
             console.log(self.ruleForm);
 
-//            self.$axios.post(self.$dispatch.aegisDownloader, data).then((resp) => {
-//
-//            }).catch((err) => {
-//              self.$notify({
-//                message: err.toString(),
-//                type: 'error'
-//              });
-//            });
-
-
+            self.$axios.post(self.$dispatch.createSpider, data).then((resp) => {
+              console.log(resp.data)
+            }).catch((err) => {
+              console.log(err);
+              self.$notify({
+                message: err.message,
+                type: 'error'
+              });
+            });
 
             self.$router.push('/spider-rules');
           } else {
@@ -162,9 +160,10 @@
             },
             error: function (xhr, status, err) {
               if (xhr.status === 401 && xhr.statusText === "Unauthorized") {
-                alert('登录已过期， 请重新登录');
+                self.$notify({message: '登录已过期， 请重新登录', type: 'error'});
 
                 localStorage.removeItem('ms_username');
+                localStorage.removeItem('JWT-MSC');
                 window.location.href = '/';
               }
             }

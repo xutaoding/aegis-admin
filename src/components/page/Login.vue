@@ -86,6 +86,8 @@
                   }
 
             }).catch((err) => {
+                console.log('2222222');
+                console.log(err.toString());
                 let message = err.non_field_errors.join();
 
                 self.$notify({message: message, type: 'error'});

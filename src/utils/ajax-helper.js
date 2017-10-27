@@ -19,6 +19,7 @@ function AjaxHelper() {
           alert('登录已过期， 请重新登录');
 
           localStorage.removeItem('ms_username');
+          localStorage.removeItem('JWT-MSC');
           window.location.href = '/';
         }
 			}

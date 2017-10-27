@@ -1,7 +1,6 @@
 import axios from 'axios'
 import Cookies from 'js-cookie'
-
-import router from '../router'
+import { Notification } from 'element-ui';
 
 /**
 *  http request 拦截器，添加认证以供后台用户认证
@@ -42,13 +41,23 @@ axios.interceptors.response.use(
     return response;
   },
   error => {
-    console.log(error.response);
+    try {
+      error.response.status
+    } catch (err) {
+      Notification({message: error.toString(), type: 'error'});
+      return error;
+    }
+
     if (error.response.status === 401 && error.response.statusText === "Unauthorized") {
       alert('登录已过期， 请重新登录');
 
       localStorage.removeItem('ms_username');
+      localStorage.removeItem('JWT-MSC');
       window.location.href = '/';
       return false;
+    } else {
+      console.log('axios-helper response error');
+      // Notification({message: error.toString(), type: 'error'});
     }
 
     return Promise.reject(error.response.data)
