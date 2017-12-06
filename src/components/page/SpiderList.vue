@@ -9,67 +9,98 @@
 
     <div class="handle-box">
       <!--<el-button type="primary" icon="delete" class="handle-del mr10" @click="delAll">批量删除</el-button>-->
-      <el-select v-model="select_cate" class="handle-select mr10">
+
+      <el-select v-model="spider_select_field" size="small" class="handle-select mr10">
         <el-option key="1" label="爬虫名称" value="spider_name"></el-option>
-        <el-option key="2" label="爬虫 ID" value="spider_uuid"></el-option>
+        <el-option key="2" label="爬虫 ID" value="spider_task_id"></el-option>
       </el-select>
-      <el-input v-model="select_word" placeholder="模糊筛选" class="handle-input mr10"></el-input>
-      <el-button type="primary" icon="search" @click="search">搜索</el-button>
+      <el-input v-model="spider_select_value" size="small" placeholder="模糊筛选" class="handle-input mr10"></el-input>
+      <el-button type="primary" icon="search" size="small" @click="search">搜索</el-button>
     </div>
 
     <div class="ms-table">
-      <el-table :data="tableData" border ref="multipleTable"  style="width: 100%">
+      <el-table :data="table_data" border stripe ref="multipleTable">
         <el-table-column type="expand">
           <template scope="props">
-            <el-form label-position="left" inline class="demo-table-expand">
-              <el-form-item label="商品名称" >
-                <span>Apple MOS</span>
-              </el-form-item>
+            <!--<div>{{ props.row}}</div>-->
+            <el-table :data="[props.row]" class="inner-table" width="1000"
+                      :row-style="{'background-color': 'lightgreen', 'color': 'orangered'}">
+              <el-table-column label="任务uid" prop="spider_task_id" width="140">
+              </el-table-column>
 
-              <el-form-item label="商品说明">
-                <span>美女专用</span>
-              </el-form-item><br>
+              <el-table-column label="方式" prop="request_method" width="65">
+              </el-table-column>
 
-              <el-form-item label="商品说明">
-                <span>美女专用</span>
-              </el-form-item>
+              <el-table-column label="登录" width="60">
+                <template scope="scope">
+                  <span>{{ scope.row.login_username ? '是': '否' }}</span>
+                </template>
+              </el-table-column>
 
-              <el-form-item label="商品说明">
-                <span>美女专用</span>
-              </el-form-item><br>
+              <el-table-column label="任务描述" prop="spider_description">
+              </el-table-column>
+            </el-table>
 
-              <el-form-item label="爬虫描述：">
-                若启用深度爬取，在爬虫的一级部后，会将用户指定的一个列表作为网址列表
-              </el-form-item>
-            </el-form>
+            <!--<el-form label-position="right" inline class="demo-table-expand" style="color: orangered">-->
+              <!--<el-form-item label="请求方式：">-->
+                <!--<span>{{ props.row.request_method }}</span>-->
+              <!--</el-form-item>-->
+
+              <!--<el-form-item label="Cookies：" style="margin-left: 5%">-->
+                <!--<span>&nbsp;&nbsp;{{ props.row.request_cookies ? '是': '否' }}</span>-->
+              <!--</el-form-item>-->
+
+              <!--<el-form-item label="是否登录：" style="margin-left: 5%">-->
+                <!--<span>{{ props.row.login_username ? '是': '否' }}</span>-->
+              <!--</el-form-item><br>-->
+
+              <!--<el-form-item label="爬虫uuid：">-->
+                <!--<span>{{ props.row.spider_task_id }}</span>-->
+              <!--</el-form-item>-->
+
+              <!--<el-form-item label="爬虫描述：" style="margin-left: 1%">-->
+                <!--<span>{{ props.row.spider_description }}</span>-->
+              <!--</el-form-item>-->
+            <!--</el-form>-->
           </template>
         </el-table-column>
+
+        <el-table-column label="创建时间" sortable width="185">
+          <!--<el-table-column label="创建时间" sortable prop="crt" width="162">-->
+          <template scope="scope">
+            <i class="el-icon-time"></i>
+            <span style="margin-left: 5px">{{ scope.row.crt }}</span>
+          </template>
+        </el-table-column>
+
+        <!--<el-table-column label="爬虫UID" sortable prop="spider_task_id">-->
+        <!--</el-table-column>-->
 
         <el-table-column label="爬虫名称" sortable prop="spider_name">
         </el-table-column>
 
-        <el-table-column label="爬虫ID" sortable prop="spider_id">
-        </el-table-column>
-
-        <el-table-column label="状态" prop="spider_status" width="95">
+        <el-table-column label="状态" prop="spider_status">
           <template scope="scope">
             <el-tag
               :type="
-                    scope.row.spider_status === 'running' ? 'success':
-                    (scope.row.spider_status === 'stop' ? 'danger':
-                    (scope.row.spider_status === 'delete' ? 'gray': '')
-                    )
+                    scope.row.spider_status === 'Running' ? 'success':
+                      (scope.row.spider_status === 'Finished' ? 'danger':
+                        (scope.row.spider_status === 'Delete' ? 'danger':
+                          (scope.row.spider_status === 'Cancel' ? 'gray':
+                            (scope.row.spider_status === 'Pending' ? 'warning': 'warning')
+                          )
+                        )
+                      )
               "
               :close-transition="true" :hit="true">
-              <span v-if="scope.row.spider_status === 'running'">{{scope.row.spider_status}}</span>
-              <span v-else-if="scope.row.spider_status === 'stop'">&nbsp;&nbsp;&nbsp;{{scope.row.spider_status}}&nbsp;&nbsp;&nbsp;</span>
-              <span v-else-if="scope.row.spider_status === 'cancel'">&nbsp;{{scope.row.spider_status}}&nbsp;&nbsp;</span>
-              <span v-else-if="scope.row.spider_status === 'delete'" style="color: red">&nbsp;{{scope.row.spider_status}}&nbsp;&nbsp;</span>
+              <span v-if="scope.row.spider_status === 'Running'">{{scope.row.spider_status}}</span>
+              <span v-else-if="scope.row.spider_status === 'Finished'">&nbsp;&nbsp;&nbsp;{{scope.row.spider_status}}&nbsp;&nbsp;&nbsp;</span>
+              <span v-else-if="scope.row.spider_status === 'Cancel'">&nbsp;{{scope.row.spider_status}}&nbsp;&nbsp;</span>
+              <span v-else-if="scope.row.spider_status === 'Delete'" style="color: red">&nbsp;{{scope.row.spider_status}}</span>
+              <span v-else-if="scope.row.spider_status === 'Pending'">&nbsp;{{scope.row.spider_status}}</span>
+              <span v-else style="color: #eb9e05">{{ scope.row.spider_status }}</span>
             </el-tag>
           </template>
-        </el-table-column>
-
-        <el-table-column label="创建时间" sortable prop="crt" width="162">
         </el-table-column>
 
         <el-table-column label="操作" width="210">
@@ -77,14 +108,7 @@
             <el-button
               size="small"
               type="text"
-              @click="detailSpider(scope.$index, scope.row)">
-              <span v-if="scope.row.spider_status !== 'delete'">详情</span>
-            </el-button>
-
-            <el-button
-              size="small"
-              type="text"
-              @click="configureSpider(scope.$index, scope.row)">
+              @click="configDetailSpider(scope.$index, scope.row)">
               <span v-if="scope.row.spider_status !== 'delete'">配置</span>
             </el-button>
 
@@ -103,6 +127,14 @@
             </el-button>
 
             <el-button
+            size="small"
+            type="text"
+            style="color: #67c23a"
+            @click="configureSpider(scope.$index, scope.row)">
+            <span v-if="scope.row.spider_status !== 'delete'">启动</span>
+            </el-button>
+
+            <el-button
               size="small"
               type="text"
               style="color: red"
@@ -115,12 +147,16 @@
       </el-table>
     </div>
 
-      <el-pagination
-        @current-change ="handleCurrentChange"
-        class="pagination"
-        layout="total, prev, pager, next, jumper"
-        :total="500">
-      </el-pagination>
+    <template>
+      <div class="block">
+        <el-pagination
+          @current-change ="handleCurrentChange"
+          class="pagination"
+          layout="total, prev, pager, next, jumper"
+          :total="total_count">
+        </el-pagination>
+      </div>
+    </template>
 
   </div>
 
@@ -128,79 +164,110 @@
 </template>
 
 <script>
+  import $ from 'jquery'
+  import Cookies from 'js-cookie'
+
   export default {
     data: function () {
+      const self = this;
+      let tasksApi = self.$dispatch.listSpider;
+
+      let obj = self.parseTableData(tasksApi);
+      console.log('kkkkkkkkkkkkkkkkkkk');
+
       return {
-        tableData: [
-          {
-            crt: '2017-10-13 17:26:53',
-            spider_id: 'ashggdjaskjyey',
-            spider_name: '测试1',
-            spider_status: 'stop'
-          },
-
-          {
-            crt: '2017-10-13 17:26:53',
-            spider_id: 'ashggdjaskjyey',
-            spider_name: '测试2',
-            spider_status: 'running'
-          },
-
-          {
-            crt: '2017-10-13 17:26:53',
-            spider_id: 'ashggdjaskjyey',
-            spider_name: '测试3',
-            spider_status: 'cancel'
-          },
-
-          {
-            crt: '2017-10-13 17:26:53',
-            spider_id: 'ashggdjaskjyey',
-            spider_name: '测试4',
-            spider_status: 'delete'
-          },
-
-        ]
+        table_data: obj.tableData,
+        total_count: obj.totalCount,
+        spider_select_field: '',
+        spider_select_value: '',
+        current_page: null
       }
     },
 
     methods: {
-      handleCurrentChange(val){
-        this.cur_page = val;
-        this.getData();
+      configDetailSpider(index, row){
+        localStorage.setItem(row.spider_task_id, JSON.stringify(row));
+        this.$router.push('/spider-configure?task_uid=' + row.spider_task_id)
       },
 
-      getData(){
-        let self = this;
-        if(process.env.NODE_ENV === 'development'){
-          self.url = '/ms/table/list';
-        }
-
-        self.$axios.post(self.url, {page:self.cur_page}).then((res) => {
-          self.tableData = res.data.list;
-        })
-      },
-
-      detailSpider(index, row){
-        this.$router.push('/spider-detail')
-      },
-
-      configureSpider(index, row){
-        this.$router.push('/spider-configure');
-      },
+//      configureSpider(index, row){
+//        this.$router.push('/spider-configure');
+//      },
 
       logSpider(index, row){
-        this.$router.push('/spider-log');
+        localStorage.setItem(row.spider_task_id, JSON.stringify(row));
+        this.$router.push('/spider-log?task_uid=' + row.spider_task_id);
       },
 
       dataSpider(index, row){
-        this.$router.push('/spider-data');
+        this.$router.push('/spider-data?task_uid=' + row.spider_task_id);
       },
 
       deleteSpider(index, row){
 
       },
 
+      handleCurrentChange(val){
+        const self = this;
+        self.current_page = val;
+        let tasksApi = self.$dispatch.listSpider;
+
+        if (self.spider_select_field && self.spider_select_value){
+          tasksApi += '?' + self.spider_select_field + '=' + self.spider_select_value;
+        }
+
+        if (self.current_page){
+          tasksApi +=  tasksApi.indexOf('?') === -1 ? '?page=' + self.current_page : '&page=' + self.current_page;
+        }
+
+        let obj = self.parseTableData(tasksApi);
+
+        self.table_data = obj.tableData;
+        self.total_count = obj.totalCount;
+      },
+
+      search(){
+        const self = this;
+        let tasksApi = self.$dispatch.listSpider;
+
+        if (self.spider_select_field && self.spider_select_value){
+          tasksApi += '?' + self.spider_select_field + '=' + self.spider_select_value;
+        }
+
+        let obj = self.parseTableData(tasksApi);
+
+        self.table_data = obj.tableData;
+        self.total_count = obj.totalCount;
+      },
+
+      parseTableData(requestUrl){
+        const self = this;
+        let totalCount= 0;
+        let tableDataList= [];
+
+        self.$ajax.get(requestUrl, {}, false, resp => {
+          if (resp.results) {
+            tableDataList = resp.results;
+            totalCount = resp.count;
+
+            for (let index in tableDataList){
+              let crt = tableDataList[index].crt;
+              let regex = /\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d\./g;
+              if (regex.test(crt)) {
+                tableDataList[index].crt = crt.substring(0, 10) + ' ' + crt.substring(11, 19);
+              }
+
+              tableDataList[index].spider_task_id = tableDataList[index].spider_task_id.replace(/-/g, '');
+            }
+          }
+        });
+
+        return {tableData: tableDataList, totalCount: totalCount};
+      },
+
+    },
+
+    computed: {
     }
 
   }
@@ -256,6 +323,21 @@
   .pagination .btn-prev {
     width: 40px;
     border-right: 1px solid #d1dbe5;
+  }
+
+  .inner-table {
+    margin-top: -1%;
+    font-size: 12px;
+
+  }
+
+  .inner-table table tr {
+    height: 5px;
+  }
+
+  .el-table__expanded-cell th, .el-table__expanded-cell th .cell {
+    /*background-color: orange;*/
+    background-color: lightgreen;
   }
 
 </style>

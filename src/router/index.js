@@ -36,7 +36,7 @@ export default new Router({
 
         {
           path: '/spider-create',
-          component: resolve => require(['../components/page/CreateSpider.vue'], resolve)
+          component: resolve => require(['../components/page/SpiderCreate.vue'], resolve)
         },
 
         {
@@ -76,28 +76,28 @@ export default new Router({
         },
 
         {
-          path: '/spider-detail',
-          component: resolve => require(['../components/page/DetailSpider.vue'], resolve)
-        },
-
-        {
           path: '/spider-configure',
-          component: resolve => require(['../components/page/ConfigureSpider.vue'], resolve)
+          component: resolve => require(['../components/page/SpiderConfigure.vue'], resolve)
         },
 
         {
           path: '/spider-log',
-          component: resolve => require(['../components/page/LogSpider.vue'], resolve)
+          component: resolve => require(['../components/page/SpiderLog.vue'], resolve)
         },
 
         {
           path: '/spider-data',
-          component: resolve => require(['../components/page/DataSpider.vue'], resolve)
+          component: resolve => require(['../components/page/SpiderData.vue'], resolve)
         },
 
         {
           path: '/spider-rules',
-          component: resolve => require(['../components/page/RulesSpider.vue'], resolve)
+          component: resolve => require(['../components/page/SpiderRules.vue'], resolve)
+        },
+
+        {
+          path: '/edit-spider-data/:task_uid/:id',
+          component: resolve => require(['../components/page/SpiderDataEdit.vue'], resolve)
         },
 
       ]

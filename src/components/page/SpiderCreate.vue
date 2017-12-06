@@ -121,7 +121,14 @@
             console.log(self.ruleForm);
 
             self.$axios.post(self.$dispatch.createSpider, data).then((resp) => {
-              console.log(resp.data)
+              console.log(resp.data);
+
+              if (resp.data.spider_task_id) {
+                localStorage.setItem('spider_task_id', resp.data.spider_task_id);
+
+                self.$router.push('/spider-rules');
+              }
+
             }).catch((err) => {
               console.log(err);
               self.$notify({
@@ -130,7 +137,7 @@
               });
             });
 
-            self.$router.push('/spider-rules');
+
           } else {
             console.log('字段错误!');
             return false;

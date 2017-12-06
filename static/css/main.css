@@ -24,8 +24,8 @@ a{text-decoration: none}
   margin-bottom: 20px;
 }
 .pagination{
-  margin: 25px 0 0 0;
-  text-align: left;
+  margin: 15px 0 0 0;
+  /*text-align: left;*/
   justify-content: left;
 }
 .plugins-tips{
